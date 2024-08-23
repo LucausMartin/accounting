@@ -27,7 +27,7 @@ function App() {
         login
       </button>
       <Outlet></Outlet>
-      {loginShow && <Login closeEvent={loginPopUpClose}></Login>}
+      <Login show={loginShow} closeEvent={loginPopUpClose}></Login>
     </div>
   );
 }
