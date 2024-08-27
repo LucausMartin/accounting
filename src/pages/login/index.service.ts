@@ -1,6 +1,13 @@
 import { fetchData, formatResonse } from '@myUtils/fetchData';
 import { SERVER_URL } from '@myConstants/index';
-import { RegisterParamsType, ResType, LoginParamsType, SendVerificationCodeParamsType } from './types';
+import {
+  RegisterParamsType,
+  RegisterResType,
+  LoginResType,
+  LoginParamsType,
+  SendVerificationCodeParamsType,
+  SendVerificationCodeResType
+} from './types';
 
 /**
  * @description 登录网络服务
@@ -11,12 +18,18 @@ class LoginService {
     'Content-Type': 'application/json'
   };
 
+  /**
+   * @description 发送验证码网络请求
+   * @param email 邮箱
+   * @param login 是否是登录
+   * @returns 发送验证码结果
+   */
   sendVerificationCode = async (email: string, login: boolean) => {
     try {
-      const res = await fetchData<ResType, SendVerificationCodeParamsType>(
+      const res = await fetchData<SendVerificationCodeResType, SendVerificationCodeParamsType>(
         'POST',
         {
-          url: this.url + '/sendVerificationCode',
+          url: this.url + '/send-verification-code',
           headers: this.headers
         },
         {
@@ -24,10 +37,11 @@ class LoginService {
           login
         }
       );
-      console.log(res);
+      return formatResonse(res);
     } catch (error) {
       // TODO: '处理错误';
       console.log(error);
+      return formatResonse({ code: 500, message: 'error', data: { error_type: 0 } });
     }
   };
 
@@ -38,35 +52,53 @@ class LoginService {
    * @returns 注册结果
    */
   register = async (email: string, code: string) => {
-    const params: RegisterParamsType = {
-      email,
-      code
-    };
-    const res = await fetchData<ResType, RegisterParamsType>(
-      'POST',
-      {
-        url: this.url + '/register',
-        headers: this.headers
-      },
-      params
-    );
-    return formatResonse(res);
+    try {
+      const params: RegisterParamsType = {
+        email,
+        code
+      };
+      const res = await fetchData<RegisterResType, RegisterParamsType>(
+        'POST',
+        {
+          url: this.url + '/register',
+          headers: this.headers
+        },
+        params
+      );
+      return formatResonse(res);
+    } catch (error) {
+      // TODO: '处理错误';
+      console.log(error);
+      return formatResonse({ code: 500, message: 'error', data: { error_type: 0 } });
+    }
   };
 
+  /**
+   * @description 登录网络请求
+   * @param email 邮箱
+   * @param code 验证码
+   * @returns 登录结果
+   */
   login = async (email: string, code: string) => {
-    const params: LoginParamsType = {
-      email,
-      code
-    };
-    const res = await fetchData<ResType, LoginParamsType>(
-      'POST',
-      {
-        url: this.url + '/login',
-        headers: this.headers
-      },
-      params
-    );
-    return formatResonse(res);
+    try {
+      const params: LoginParamsType = {
+        email,
+        code
+      };
+      const res = await fetchData<LoginResType, LoginParamsType>(
+        'POST',
+        {
+          url: this.url + '/login',
+          headers: this.headers
+        },
+        params
+      );
+      return formatResonse(res);
+    } catch (error) {
+      // TODO: '处理错误';
+      console.log(error);
+      return formatResonse({ code: 500, message: 'error', data: { error_type: 0 } });
+    }
   };
 }
 

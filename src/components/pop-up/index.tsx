@@ -21,7 +21,14 @@ export const PopUp: FC<{ children: JSX.Element; closeEvent: () => void; show: bo
       className="pop-up-container"
       onClick={closeEvent}
     >
-      {children}
+      <div
+        style={{
+          transform: `scale(${show ? 1 : 0})`,
+          transition: 'transform 0.3s ease-in-out'
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 };
