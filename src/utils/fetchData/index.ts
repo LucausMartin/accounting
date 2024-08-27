@@ -9,8 +9,8 @@ type Options = {
   };
 };
 
-export type successNumber = HTTP_STATUS.OK | HTTP_STATUS.CREATED;
-export type failNumber =
+export type SuccessNumber = HTTP_STATUS.OK | HTTP_STATUS.CREATED;
+export type FailNumber =
   | HTTP_STATUS.BAD_REQUEST
   | HTTP_STATUS.UNAUTHORIZED
   | HTTP_STATUS.FORBIDDEN
@@ -23,9 +23,9 @@ async function fetchData<Data>(
   method: 'GET',
   options: Options
 ): Promise<
-  | { code: successNumber; message: string; data: Data }
+  | { code: SuccessNumber; message: string; data: Data }
   | {
-      code: failNumber;
+      code: FailNumber;
       message: string;
       data: {
         error_type: number;
@@ -37,9 +37,9 @@ async function fetchData<Data, Params>(
   options: Options,
   params: Params
 ): Promise<
-  | { code: successNumber; message: string; data: Data }
+  | { code: SuccessNumber; message: string; data: Data }
   | {
-      code: failNumber;
+      code: FailNumber;
       message: string;
       data: {
         error_type: number;
@@ -53,9 +53,9 @@ async function fetchData<Data, Params>(
   options: Options,
   params?: Params
 ): Promise<
-  | { code: successNumber; message: string; data: Data }
+  | { code: SuccessNumber; message: string; data: Data }
   | {
-      code: failNumber;
+      code: FailNumber;
       message: string;
       data: {
         error_type: number;
@@ -114,32 +114,38 @@ async function fetchData<Data, Params>(
   throw new Error('method is not supported');
 }
 
+type ResType<ResDataType> =
+  | { code: SuccessNumber; message: string; data: ResDataType }
+  | {
+      code: FailNumber;
+      message: string;
+      data: {
+        error_type: number;
+      };
+    };
+
+type ResTypeWithSuccess<ResDataType> = {
+  success: true;
+  data: ResDataType;
+  message: string;
+};
+
+type ResTypeWithFail = {
+  success: false;
+  data: { error_type: number };
+  message: string;
+};
+
 /**
  * @description 格式化返回数据
  * @param res 请求回来的数据
  * @returns 格式化后的数据
  */
-function formatResonse<ResDataType>(
-  res:
-    | { code: successNumber; message: string; data: ResDataType }
-    | {
-        code: failNumber;
-        message: string;
-        data: {
-          error_type: number;
-        };
-      }
-):
-  | {
-      success: true;
-      data: ResDataType;
-      message: string;
-    }
-  | {
-      success: false;
-      data: { error_type: number };
-      message: string;
-    } {
+function formatResonse<
+  ResDataType = {
+    error_type: number;
+  }
+>(res: ResType<ResDataType>): ResTypeWithSuccess<ResDataType> | ResTypeWithFail {
   if (isSuccess(res.code)) {
     return {
       success: true,
@@ -159,7 +165,7 @@ function formatResonse<ResDataType>(
  * @description 判断是否是成功的状态码
  * @param value 状态码
  */
-const isSuccess = (value: number): value is successNumber => {
+export const isSuccess = (value: number): value is SuccessNumber => {
   return value === HTTP_STATUS.OK || value === HTTP_STATUS.CREATED;
 };
 

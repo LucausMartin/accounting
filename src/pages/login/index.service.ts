@@ -1,5 +1,5 @@
 import { fetchData, formatResonse } from '@myUtils/fetchData';
-import { SERVER_URL } from '@myConstants/index';
+import { SERVER_URL, HTTP_STATUS } from '@myConstants/index';
 import {
   RegisterParamsType,
   RegisterResType,
@@ -65,11 +65,15 @@ class LoginService {
         },
         params
       );
-      return formatResonse(res);
+      return formatResonse<RegisterResType>(res);
     } catch (error) {
       // TODO: '处理错误';
       console.log(error);
-      return formatResonse({ code: 500, message: 'error', data: { error_type: 0 } });
+      return formatResonse<RegisterResType>({
+        code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        message: 'error',
+        data: { error_type: 0 }
+      });
     }
   };
 
@@ -97,7 +101,7 @@ class LoginService {
     } catch (error) {
       // TODO: '处理错误';
       console.log(error);
-      return formatResonse({ code: 500, message: 'error', data: { error_type: 0 } });
+      return formatResonse<LoginResType>({ code: 500, message: 'error', data: { error_type: 0 } });
     }
   };
 }

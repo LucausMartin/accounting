@@ -12,6 +12,7 @@ import {
   LoginErrorTypeEnums
 } from './constants';
 import './index.less';
+import localforage from 'localforage';
 
 export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEvent, show }) => {
   const [sendButText, setSendButText] = useState<'Send' | number>('Send');
@@ -131,6 +132,9 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
           setError(ErrorMessageEnum.NETWORK);
           break;
       }
+    } else {
+      await localforage.setItem('token', res.data.auth);
+      closeEvent();
     }
   };
 
@@ -151,6 +155,9 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
           setError(ErrorMessageEnum.NETWORK);
           break;
       }
+    } else {
+      await localforage.setItem('token', res.data.auth);
+      closeEvent();
     }
   };
 
@@ -195,7 +202,7 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
         }}
       >
         <span className="title">{state === StateEnum.LOGIN ? 'Login' : 'Register'}</span>
-        <Typewriter text={ErrorMessage[error]} typingSpeed={50} className="typewriter" />
+        <Typewriter text={ErrorMessage[error]} typingSpeed={50} className="type-writer" />
         <Close className="close" onClick={closeLogin}></Close>
         <TextField
           className="text-field"

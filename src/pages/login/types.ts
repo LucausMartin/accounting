@@ -1,9 +1,9 @@
 export interface RegisterResType {
-  success: true;
+  auth: string;
 }
 
 export interface LoginResType {
-  success: true;
+  auth: string;
 }
 
 export interface SendVerificationCodeResType {
