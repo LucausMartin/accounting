@@ -15,7 +15,9 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
   /**
    * @description 发送验证码事件
    */
-  const sendVerificationCode = () => {
+  const sendVerificationCode = async () => {
+    const res = await loginService.sendVerificationCode(email, state === StateTypes.LOGIN);
+    console.log(res);
     setSendButText(30);
   };
 

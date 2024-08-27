@@ -9,7 +9,7 @@ type Options = {
 };
 
 export type successNumber = 200 | 201;
-export type failNumber = 500 | 401 | 503 | 400;
+export type failNumber = 500 | 401 | 503 | 400 | 404;
 
 // 函数重载
 async function fetchData<Data>(
@@ -64,11 +64,11 @@ async function fetchData<Data, Params>(
         headers:
           headers === undefined || headers['Content-Type'] === ''
             ? {
-                Authorization: tokenValue ? `Bearer ${tokenValue}` : ''
+                Authorization: tokenValue ? `Bearer ${tokenValue}` : 'Bearer '
               }
             : {
                 'Content-Type': headers ? headers['Content-Type'] : 'application/json',
-                Authorization: tokenValue ? `Bearer ${tokenValue}` : ''
+                Authorization: tokenValue ? `Bearer ${tokenValue}` : 'Bearer '
               },
         body: headers && headers['Content-Type'] === '' ? (params as FormData) : JSON.stringify(params)
       });
@@ -86,6 +86,11 @@ async function fetchData<Data, Params>(
   throw new Error('method is not supported');
 }
 
+/**
+ * @description 格式化返回数据
+ * @param res 请求回来的数据
+ * @returns 格式化后的数据
+ */
 function formatResonse<ResDataType>(
   res:
     | { code: successNumber; message: 'success'; data: ResDataType }

@@ -4,24 +4,25 @@ export enum StateTypes {
   REGISTER
 }
 
-export interface RegisterResType {
+export interface ResType {
   code: number;
   message: string;
-  data: Record<string, object>;
+  data: {
+    success: true;
+  };
 }
 
-export interface RegisterParams {
+export interface RegisterParamsType {
   email: string;
   code: string;
 }
 
-export interface LoginResType {
-  code: number;
-  message: string;
-  data: Record<string, object>;
-}
-
-export interface LoginParams {
+export interface LoginParamsType {
   email: string;
   code: string;
+}
+
+export interface SendVerificationCodeParamsType {
+  email: string;
+  login: boolean;
 }
