@@ -1,5 +1,7 @@
 import localforage from 'localforage';
-import { HTTP_STATUS } from '@myConstants/index';
+import { ready } from '@myStore/slices/login';
+import store from '@myStore/index';
+import { HTTP_STATUS, SERVER_URL } from '@myConstants/index';
 
 // 网络请求封装，第一个范型是返回的数据类型，第二个范型是请求参数的类型
 type Options = {
@@ -65,19 +67,54 @@ async function fetchData<Data, Params>(
   const { url, headers } = options;
   if (method === 'GET') {
     try {
-      const tokenValue = await localforage.getItem<string>('token');
+      const access_token = await localforage.getItem<string>('access_token');
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': headers ? headers['Content-Type'] : 'application/json',
-          Authorization: tokenValue ? `Bearer ${tokenValue}` : ''
+          Authorization: access_token ? `Bearer ${access_token}` : ''
         }
       });
-      if (response.status === 404) {
-        throw new Error('404');
-      }
       const responseJson = await response.json();
-      return responseJson;
+      if (responseJson.code) {
+        return responseJson;
+      }
+      if (!isSuccess(responseJson.statusCode)) {
+        console.log(1);
+        if (responseJson.statusCode === HTTP_STATUS.UNAUTHORIZED) {
+          console.log(2);
+          await localforage.removeItem('access_token');
+          const refresh_token = await localforage.getItem<string>('refresh_token');
+          console.log(3, refresh_token);
+          if (!refresh_token) {
+            store.dispatch(ready());
+            throw new Error('no refresh token');
+          }
+          try {
+            const newAccessToken = await fetch(`${SERVER_URL}/users/refresh-token`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: refresh_token ? `Bearer ${refresh_token}` : ''
+              }
+            });
+            const newAccessTokenJson = await newAccessToken.json();
+            console.log(newAccessTokenJson);
+            if (newAccessTokenJson.code === HTTP_STATUS.OK) {
+              console.log(4);
+              await localforage.setItem('access_token', newAccessTokenJson.data.accessToken);
+              return fetchData(method, options);
+            } else {
+              await localforage.removeItem('refresh_token');
+              store.dispatch(ready());
+              throw new Error(newAccessTokenJson.message);
+            }
+          } catch {
+            throw new Error('refresh token error');
+          }
+        }
+        throw new Error(responseJson.message);
+      }
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
@@ -86,24 +123,24 @@ async function fetchData<Data, Params>(
   }
   if (method === 'POST') {
     try {
-      const tokenValue = await localforage.getItem<string>('token');
+      const access_token = await localforage.getItem<string>('access_token');
       const response = await fetch(url, {
         method: 'POST',
         headers:
           headers === undefined || headers['Content-Type'] === ''
             ? {
-                Authorization: tokenValue ? `Bearer ${tokenValue}` : 'Bearer '
+                Authorization: access_token ? `Bearer ${access_token}` : 'Bearer '
               }
             : {
                 'Content-Type': headers ? headers['Content-Type'] : 'application/json',
-                Authorization: tokenValue ? `Bearer ${tokenValue}` : 'Bearer '
+                Authorization: access_token ? `Bearer ${access_token}` : 'Bearer '
               },
         body: headers && headers['Content-Type'] === '' ? (params as FormData) : JSON.stringify(params)
       });
-      if (response.status === 404) {
-        throw new Error('404');
-      }
       const responseJson = await response.json();
+      if (!isSuccess(responseJson.statusCode)) {
+        throw new Error(responseJson.message);
+      }
       return responseJson;
     } catch (err) {
       if (err instanceof Error) {

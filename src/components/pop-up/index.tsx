@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import './index.less';
 
 /**
@@ -12,6 +12,24 @@ export const PopUp: FC<{ children: JSX.Element; closeEvent: () => void; show: bo
   closeEvent,
   show
 }) => {
+  const [mouseUp, setMouseUp] = useState(false);
+  const [mouseDown, setMouseDown] = useState(false);
+  const close = () => {
+    closeEvent();
+  };
+
+  const clear = () => {
+    setMouseDown(false);
+    setMouseUp(false);
+  };
+
+  useEffect(() => {
+    if (show) {
+      setMouseUp(false);
+      setMouseDown(false);
+    }
+  }, [show]);
+
   return (
     <div
       style={{
@@ -19,10 +37,25 @@ export const PopUp: FC<{ children: JSX.Element; closeEvent: () => void; show: bo
         opacity: show ? 1 : 0
       }}
       className="pop-up-container"
-      onClick={closeEvent}
+      onClick={mouseUp && mouseDown ? close : clear}
+      onMouseUp={() => setMouseUp(true)}
+      onMouseDown={() => setMouseDown(true)}
     >
       <div
+        onClick={e => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onMouseDown={e => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onMouseUp={e => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         style={{
+          zIndex: 1000,
           transform: `scale(${show ? 1 : 0})`,
           transition: 'transform 0.3s ease-in-out'
         }}

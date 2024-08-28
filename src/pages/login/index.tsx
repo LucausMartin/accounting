@@ -195,12 +195,7 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
 
   return (
     <PopUp closeEvent={closeEvent} show={show}>
-      <div
-        className="login-container"
-        onClick={e => {
-          e.stopPropagation();
-        }}
-      >
+      <div className="login-container">
         <span className="title">{state === StateEnum.LOGIN ? 'Login' : 'Register'}</span>
         <Typewriter text={ErrorMessage[error]} typingSpeed={50} className="type-writer" />
         <Close className="close" onClick={closeLogin}></Close>
