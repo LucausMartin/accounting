@@ -89,7 +89,7 @@ async function fetchData<Data, Params>(
           // 如果没有 refresh token，说明用户未登录
           if (!refresh_token) {
             store.dispatch(ready());
-            throw new Error('no refresh token');
+            throw new Error('请先登录');
           }
           // 有 refresh token，尝试刷新 token
           try {
@@ -110,7 +110,7 @@ async function fetchData<Data, Params>(
               // 刷新 token 失败，删除 token，返回登录页
               await localforage.removeItem('refresh_token');
               store.dispatch(ready());
-              throw new Error(newAccessTokenJson.message);
+              throw new Error('身份验证已经过期，请重新登录');
             }
           } catch {
             throw new Error('refresh token error');

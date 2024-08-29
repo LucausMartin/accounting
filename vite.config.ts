@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { join } from 'path'
+import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,7 +17,36 @@ export default defineConfig({
       '@myConstants': join(__dirname, 'src/constants'),
     }
   },
-  plugins: [react()],
+  plugins: [react(), VitePWA({
+    registerType: 'autoUpdate',
+    manifest: {
+      name: "accounting",
+      short_name: "accounting",
+      description: "Record every bill",
+      theme_color: "#242424",
+      background_color: "#242424",
+      icons: [
+        {
+          src: "/pwa-64x64.png",
+          sizes: "64x64",
+          type: "image/png",
+        },
+        {
+          src: "/pwa-192x192.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+        {
+          src: "/pwa-512x512.png",
+          sizes: "512x512",
+          type: "image/png",
+        },
+      ],
+    },
+    devOptions: {
+      enabled: true
+    },
+  })],
   css: {
     preprocessorOptions: {
       less: {
