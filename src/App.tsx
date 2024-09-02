@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { logout, selectLogin } from '@myStore/slices/login';
 // import { fetchData } from '@myUtils/fetchData';
 import { useAppDispatch, useAppSelector } from '@myStore/hooks';
@@ -6,10 +6,12 @@ import { Login } from '@myPages/login';
 import { LOGIN_STATE_ENUM } from '@myConstants/index';
 import { Home, BarChart, AccountCircle } from '@mui/icons-material';
 import './App.less';
+import { useEffect } from 'react';
 
 function App() {
   const loginState = useAppSelector(selectLogin);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   // const test = async () => {
   //   try {
@@ -26,13 +28,16 @@ function App() {
   //   }
   // };
 
+  useEffect(() => {
+    navigate('/home');
+  }, []);
+
   return (
     <div className="app">
       <div className="content-container">
         <NavBar />
         <div className="content">
-          123
-          <Outlet></Outlet>
+          <Outlet />
         </div>
       </div>
       <Login
@@ -45,16 +50,39 @@ function App() {
   );
 }
 
+/**
+ * @description 导航栏
+ */
 const NavBar = () => {
+  const navigate = useNavigate();
+
+  const toPage = (url: string) => {
+    navigate(url);
+  };
   return (
     <div className="nav">
-      <div className="button-nav">
+      <div
+        className="button-nav"
+        onClick={() => {
+          toPage('/home');
+        }}
+      >
         <Home />
       </div>
-      <div className="button-nav">
+      <div
+        className="button-nav"
+        onClick={() => {
+          toPage('/statistics');
+        }}
+      >
         <BarChart />
       </div>
-      <div className="button-nav">
+      <div
+        className="button-nav"
+        onClick={() => {
+          toPage('/me');
+        }}
+      >
         <AccountCircle />
       </div>
     </div>

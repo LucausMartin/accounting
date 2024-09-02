@@ -1,7 +1,7 @@
 /**
  * @description 登录注册页面提示字符串常量
  */
-export const ErrorMessage = {
+export const ERRORMESSAGE = {
   ['default']: `${String.fromCodePoint(0x1f389)} Log in to get started`,
   ['sending']: `${String.fromCodePoint(0x1f4e7)} Sending...`,
   ['register']: `${String.fromCodePoint(0x1f389)} Register to get started`,

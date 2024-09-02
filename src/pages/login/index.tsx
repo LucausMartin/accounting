@@ -4,7 +4,7 @@ import { Close } from '@mui/icons-material';
 import { FC, useEffect, useState } from 'react';
 import loginService from './index.service';
 import {
-  ErrorMessage,
+  ERRORMESSAGE,
   ErrorMessageEnum,
   StateEnum,
   SendCodeErrorTypeEnums,
@@ -199,7 +199,7 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
     <PopUp closeEvent={closeEvent} show={show}>
       <div className="login-container">
         <span className="title">{state === StateEnum.LOGIN ? 'Login' : 'Register'}</span>
-        <Typewriter text={ErrorMessage[error]} typingSpeed={50} className="type-writer" />
+        <Typewriter text={ERRORMESSAGE[error]} typingSpeed={50} className="type-writer" />
         <Close className="close" onClick={closeLogin}></Close>
         <TextField
           className="text-field"
