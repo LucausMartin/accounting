@@ -4,8 +4,8 @@ export interface RegisterResType {
 }
 
 export interface LoginResType {
-  access_token: string;
-  refresh_token: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface SendVerificationCodeResType {

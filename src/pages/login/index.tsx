@@ -157,8 +157,8 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
           break;
       }
     } else {
-      await localforage.setItem('access_token', res.data.access_token);
-      await localforage.setItem('refresh_token', res.data.refresh_token);
+      await localforage.setItem('access_token', res.data.accessToken);
+      await localforage.setItem('refresh_token', res.data.refreshToken);
       closeEvent();
     }
   };
