@@ -1,7 +1,7 @@
 import localforage from 'localforage';
 import { ready } from '@myStore/slices/login';
 import store from '@myStore/index';
-import { HTTP_STATUS, SERVER_URL } from '@myConstants/index';
+import { HTTP_STATUS_ENUM, SERVER_URL } from '@myConstants/index';
 
 // 网络请求封装，第一个范型是返回的数据类型，第二个范型是请求参数的类型
 type Options = {
@@ -11,14 +11,14 @@ type Options = {
   };
 };
 
-export type SuccessNumber = HTTP_STATUS.OK | HTTP_STATUS.CREATED;
+export type SuccessNumber = HTTP_STATUS_ENUM.OK | HTTP_STATUS_ENUM.CREATED;
 export type FailNumber =
-  | HTTP_STATUS.BAD_REQUEST
-  | HTTP_STATUS.UNAUTHORIZED
-  | HTTP_STATUS.FORBIDDEN
-  | HTTP_STATUS.NOT_FOUND
-  | HTTP_STATUS.CONFLICT
-  | HTTP_STATUS.INTERNAL_SERVER_ERROR;
+  | HTTP_STATUS_ENUM.BAD_REQUEST
+  | HTTP_STATUS_ENUM.UNAUTHORIZED
+  | HTTP_STATUS_ENUM.FORBIDDEN
+  | HTTP_STATUS_ENUM.NOT_FOUND
+  | HTTP_STATUS_ENUM.CONFLICT
+  | HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR;
 
 // 函数重载
 async function fetchData<Data>(
@@ -83,7 +83,7 @@ async function fetchData<Data, Params>(
       // 如果返回的数据中有 statusCode 字段，说明是后端返回的自动返回的错误
       if (responseJson.statusCode) {
         // 如果是未授权，说明 token 过期，需要刷新 token
-        if (responseJson.statusCode === HTTP_STATUS.UNAUTHORIZED) {
+        if (responseJson.statusCode === HTTP_STATUS_ENUM.UNAUTHORIZED) {
           await localforage.removeItem('access_token');
           const refresh_token = await localforage.getItem<string>('refresh_token');
           // 如果没有 refresh token，说明用户未登录
@@ -101,7 +101,7 @@ async function fetchData<Data, Params>(
               }
             });
             const newAccessTokenJson = await newAccessToken.json();
-            if (newAccessTokenJson.code === HTTP_STATUS.OK) {
+            if (newAccessTokenJson.code === HTTP_STATUS_ENUM.OK) {
               // 刷新 token 成功，更新 token
               await localforage.setItem('access_token', newAccessTokenJson.data.access_token);
               await localforage.setItem('refresh_token', newAccessTokenJson.data.refresh_token);
@@ -148,7 +148,7 @@ async function fetchData<Data, Params>(
       // 如果返回的数据中没有 code 字段，说明是后端返回自动返回的错误
       if (responseJson.statusCode) {
         // 如果是未授权，说明 token 过期，需要刷新 token
-        if (responseJson.statusCode === HTTP_STATUS.UNAUTHORIZED) {
+        if (responseJson.statusCode === HTTP_STATUS_ENUM.UNAUTHORIZED) {
           await localforage.removeItem('access_token');
           const refresh_token = await localforage.getItem<string>('refresh_token');
           // 如果没有 refresh token，说明用户未登录
@@ -166,7 +166,7 @@ async function fetchData<Data, Params>(
               }
             });
             const newAccessTokenJson = await newAccessToken.json();
-            if (newAccessTokenJson.code === HTTP_STATUS.OK) {
+            if (newAccessTokenJson.code === HTTP_STATUS_ENUM.OK) {
               // 刷新 token 成功，更新 token
               await localforage.setItem('access_token', newAccessTokenJson.data.access_token);
               await localforage.setItem('refresh_token', newAccessTokenJson.data.refresh_token);
@@ -244,7 +244,7 @@ function formatResonse<
  * @param value 状态码
  */
 export const isSuccess = (value: number): value is SuccessNumber => {
-  return value === HTTP_STATUS.OK || value === HTTP_STATUS.CREATED;
+  return value === HTTP_STATUS_ENUM.OK || value === HTTP_STATUS_ENUM.CREATED;
 };
 
 export { fetchData, formatResonse };

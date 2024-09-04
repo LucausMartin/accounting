@@ -9,17 +9,20 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PopUp } from '@myComponents/pop-up';
 import { ReactSetState } from '@myTypes/index';
+import { NewKind } from '@myComponents/new-kind';
 import './index.less';
 
 /**
  * @description 新账单组件
  * @param {() => void} close 关闭事件
+ * @param {boolean} show 是否显示
  */
-const NewRecord: FC<{ close: () => void }> = ({ close }) => {
+const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) => {
   const [kind, setKind] = useState(KINDLIST[0]);
   const [costNumber, setCostNumber] = useState('');
   const [time, setTime] = useState<Dayjs>(dayjs());
   const [showCalendar, setShowCalendar] = useState(false);
+  const [addKindShow, setAddKindShow] = useState(false);
 
   /**
    * @description 关闭日历
@@ -27,6 +30,13 @@ const NewRecord: FC<{ close: () => void }> = ({ close }) => {
   const closeCalendar = () => {
     console.log('closeCalendar');
     setShowCalendar(false);
+  };
+
+  /**
+   * @description 关闭添加种类
+   */
+  const closeAddKind = () => {
+    setAddKindShow(false);
   };
 
   /**
@@ -69,7 +79,15 @@ const NewRecord: FC<{ close: () => void }> = ({ close }) => {
   }, []);
 
   return (
-    <div className="home-new-record">
+    <div
+      className="home-new-record"
+      style={{
+        top: show ? '0' : '100%',
+        zIndex: show ? '1' : '-1',
+        opacity: show ? '1' : '0'
+      }}
+    >
+      <NewKind type={kind} close={closeAddKind} show={addKindShow} />
       <Close className="close" onClick={close} />
       <div
         style={{
@@ -92,6 +110,11 @@ const NewRecord: FC<{ close: () => void }> = ({ close }) => {
       </div>
       <div className="record-content">
         <button onClick={sendKindTest}></button>
+        <button
+          onClick={() => {
+            setAddKindShow(true);
+          }}
+        ></button>
       </div>
       <div className="record-cost-info">{`${time.format('YYYY-MM-DD')} / ${kind.title}`}</div>
       <div className="record-action">

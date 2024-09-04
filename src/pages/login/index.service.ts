@@ -1,5 +1,5 @@
 import { fetchData, formatResonse } from '@myUtils/fetchData';
-import { SERVER_URL, HTTP_STATUS } from '@myConstants/index';
+import { SERVER_URL, HTTP_STATUS_ENUM } from '@myConstants/index';
 import {
   RegisterParamsType,
   RegisterResType,
@@ -70,7 +70,7 @@ class LoginService {
       // TODO: '处理错误';
       console.log(error);
       return formatResonse<RegisterResType>({
-        code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR,
         message: 'error',
         data: { error_type: 0 }
       });

@@ -1,10 +1,16 @@
+import { NEW_KIND_TYPE_ENUM } from '@myConstants/index';
+
 export const KINDLIST = [
   {
     id: 0,
-    title: '支出'
+    type: NEW_KIND_TYPE_ENUM.EXPENSES,
+    title: '支出',
+    parents: true
   },
   {
     id: 1,
-    title: '收入'
+    type: NEW_KIND_TYPE_ENUM.INCOME,
+    title: '收入',
+    parents: true
   }
 ];

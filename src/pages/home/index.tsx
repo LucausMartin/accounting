@@ -8,7 +8,7 @@ const Home = () => {
 
   return (
     <div className="home">
-      {showNewRecord && <NewRecord close={() => setShowNewRecord(false)} />}
+      <NewRecord close={() => setShowNewRecord(false)} show={showNewRecord} />
       <CostCard />
       <div className="new-record-button" onClick={() => setShowNewRecord(true)}>
         <NoteAlt />
