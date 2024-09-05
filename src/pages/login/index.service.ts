@@ -20,8 +20,8 @@ class LoginService {
 
   /**
    * @description 发送验证码网络请求
-   * @param email 邮箱
-   * @param login 是否是登录
+   * @param { string } email 邮箱
+   * @param { boolean } login 是否是登录
    * @returns 发送验证码结果
    */
   sendVerificationCode = async (email: string, login: boolean) => {
@@ -41,14 +41,14 @@ class LoginService {
     } catch (error) {
       // TODO: '处理错误';
       console.log(error);
-      return formatResonse({ code: 500, message: 'error', data: { error_type: 0 } });
+      return formatResonse({ code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR, message: 'error', data: { error_type: 0 } });
     }
   };
 
   /**
    * @description 注册网络请求
-   * @param email email
-   * @param code 验证码
+   * @param { string } email email
+   * @param { string } code 验证码
    * @returns 注册结果
    */
   register = async (email: string, code: string) => {
@@ -79,8 +79,8 @@ class LoginService {
 
   /**
    * @description 登录网络请求
-   * @param email 邮箱
-   * @param code 验证码
+   * @param { string } email 邮箱
+   * @param { string } code 验证码
    * @returns 登录结果
    */
   login = async (email: string, code: string) => {
@@ -101,7 +101,11 @@ class LoginService {
     } catch (error) {
       // TODO: '处理错误';
       console.log(error);
-      return formatResonse<LoginResType>({ code: 500, message: 'error', data: { error_type: 0 } });
+      return formatResonse<LoginResType>({
+        code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR,
+        message: 'error',
+        data: { error_type: 0 }
+      });
     }
   };
 }

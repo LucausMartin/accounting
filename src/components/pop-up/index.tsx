@@ -3,9 +3,9 @@ import './index.less';
 
 /**
  * @description 带有过渡动画的全屏遮罩弹窗
- * @param {JSX.Element} children
- * @param {() => void} closeEvent
- * @param {boolean} show
+ * @param { JSX.Element } children
+ * @param { () => void } closeEvent
+ * @param { boolean } show
  */
 export const PopUp: FC<{ children: JSX.Element; closeEvent: () => void; show: boolean }> = ({
   children,
@@ -23,6 +23,7 @@ export const PopUp: FC<{ children: JSX.Element; closeEvent: () => void; show: bo
     setMouseUp(false);
   };
 
+  // 保证各种拖拽和点击都是正确的逻辑
   useEffect(() => {
     if (show) {
       setMouseUp(false);
@@ -34,7 +35,8 @@ export const PopUp: FC<{ children: JSX.Element; closeEvent: () => void; show: bo
     <div
       style={{
         zIndex: show ? 999 : -1,
-        opacity: show ? 1 : 0
+        opacity: show ? 1 : 0,
+        pointerEvents: show ? 'auto' : 'none'
       }}
       className="pop-up-container"
       onClick={mouseUp && mouseDown ? close : clear}

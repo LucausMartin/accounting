@@ -49,7 +49,13 @@ async function fetchData<Data, Params>(
     }
 >;
 
-// 函数实现
+/**
+ * @description 发送请求
+ * @param { 'GET' | 'POST' } method 请求方式
+ * @param { Options } options 请求配置
+ * @param { Params } params 请求参数（只会和 method === POST 一起出现）
+ * @returns 请求结果
+ */
 async function fetchData<Data, Params>(
   method: 'GET' | 'POST',
   options: Options,

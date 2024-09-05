@@ -1,3 +1,6 @@
+/**
+ * @description 统计页面
+ */
 const Statistics = () => {
   return (
     <div className="home">

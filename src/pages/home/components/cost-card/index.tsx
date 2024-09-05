@@ -1,6 +1,9 @@
 import { CostNumber } from '../cost-number';
 import './index.less';
 
+/**
+ * @description 账单卡片
+ */
 const CostCard = () => {
   return (
     <div className="home-card">

@@ -28,9 +28,11 @@ function App() {
     }
   };
 
+  // 默认转跳到首页
   useEffect(() => {
     navigate('/home');
     test();
+    window.opener = window;
   }, []);
 
   return (

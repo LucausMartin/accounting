@@ -1,5 +1,5 @@
 import { Close, CalendarMonth } from '@mui/icons-material';
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { formatNumberToString, fetchData } from '@myUtils/index';
 import dayjs, { Dayjs } from 'dayjs';
 import { KINDLIST } from './constants';
@@ -10,19 +10,35 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PopUp } from '@myComponents/pop-up';
 import { ReactSetState } from '@myTypes/index';
 import { NewKind } from '@myComponents/new-kind';
+import { usePopstateNotLeave } from '@myHooks/usePopstate';
 import './index.less';
 
 /**
  * @description 新账单组件
- * @param {() => void} close 关闭事件
- * @param {boolean} show 是否显示
+ * @param { () => void } close 关闭事件
+ * @param { boolean } show 是否显示
  */
 const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) => {
+  // 页面类型
   const [kind, setKind] = useState(KINDLIST[0]);
+  // 消费金额
   const [costNumber, setCostNumber] = useState('');
+  // 该账单时间
   const [time, setTime] = useState<Dayjs>(dayjs());
+  // 是否显示日历
   const [showCalendar, setShowCalendar] = useState(false);
+  // 是否显示添加种类页面
   const [addKindShow, setAddKindShow] = useState(false);
+
+  /**
+   * @description 返回事件
+   */
+  const backEvent = useCallback(() => {
+    close();
+  }, []);
+
+  // 非叶子组件通用监听返回逻辑
+  usePopstateNotLeave(addKindShow, backEvent);
 
   /**
    * @description 关闭日历
@@ -49,6 +65,9 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
     setShowCalendar(false);
   };
 
+  /**
+   * @description 发送添加种类测试
+   */
   const sendKindTest = () => {
     const res = fetchData<{ test: string }, { name: string }>(
       'POST',
@@ -65,25 +84,12 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
     console.log(res);
   };
 
-  /**
-   * @description 监听返回事件
-   */
-  useEffect(() => {
-    const backEvent = () => {
-      close();
-    };
-    window.addEventListener('popstate', backEvent, false);
-    return () => {
-      window.removeEventListener('popstate', backEvent, false);
-    };
-  }, []);
-
   return (
     <div
       className="home-new-record"
       style={{
-        top: show ? '0' : '100%',
-        zIndex: show ? '1' : '-1',
+        top: show ? '0' : '100dvh',
+        zIndex: show ? '1' : '-2',
         opacity: show ? '1' : '0'
       }}
     >
@@ -114,7 +120,9 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
           onClick={() => {
             setAddKindShow(true);
           }}
-        ></button>
+        >
+          new kind
+        </button>
       </div>
       <div className="record-cost-info">{`${time.format('YYYY-MM-DD')} / ${kind.title}`}</div>
       <div className="record-action">

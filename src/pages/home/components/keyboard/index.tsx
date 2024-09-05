@@ -5,8 +5,8 @@ import './index.less';
 
 /**
  * @description 虚拟键盘
- * @param {ReactSetState<string>} setCostNumber 设置消费金额事件
- * @param {() => void} reset 重置事件
+ * @param { ReactSetState<string> } setCostNumber 设置消费金额事件
+ * @param { () => void } reset 重置事件
  */
 const Keyboard: FC<{ setCostNumber: ReactSetState<string>; reset: () => void }> = ({ setCostNumber, reset }) => {
   /**
@@ -34,7 +34,7 @@ const Keyboard: FC<{ setCostNumber: ReactSetState<string>; reset: () => void }> 
 
   /**
    * @description 添加金额数字
-   * @param {string} str 字符
+   * @param  { string } str 字符
    */
   const addCostNumber = (str: string) => {
     vibrate();

@@ -14,14 +14,27 @@ import {
 import './index.less';
 import localforage from 'localforage';
 
+/**
+ * @description 登录组件
+ * @param { () => void } closeEvent 关闭事件
+ * @param { boolean } show 是否显示
+ */
 export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEvent, show }) => {
+  // 发送验证码按钮文本
   const [sendButText, setSendButText] = useState<'Send' | number>('Send');
+  // 发送验证码按钮是否禁用
   const [sendButDisable, setSendButDisable] = useState(false);
+  // 该组件目前状态
   const [state, setState] = useState<StateEnum.LOGIN | StateEnum.REGISTER>(StateEnum.LOGIN);
+  // 邮箱
   const [email, setEmail] = useState('');
+  // 邮箱错误标识
   const [emailError, setEmailError] = useState(false);
+  // 验证码
   const [code, setCode] = useState('');
+  // 验证码错误标识
   const [codeError, setCodeError] = useState(false);
+  // 错误信息
   const [error, setError] = useState<ErrorMessageEnum>(ErrorMessageEnum.DEFAULT);
 
   /**
@@ -112,6 +125,9 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
     }
   };
 
+  /**
+   * @description 注册事件
+   */
   const register = async () => {
     const res = await loginService.register(email, code);
     if (!res.success) {
@@ -139,6 +155,9 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
     }
   };
 
+  /**
+   * @description 登录事件
+   */
   const login = async () => {
     const res = await loginService.login(email, code);
     if (!res.success) {

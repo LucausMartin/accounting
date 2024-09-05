@@ -2,9 +2,9 @@ import { FC, useState, useEffect } from 'react';
 
 /**
  * @description 打字机效果
- * @param text 文本
- * @param typingSpeed 打字速度
- * @param className 类名
+ * @param { string } text 文本
+ * @param { number }typingSpeed 打字速度
+ * @param { string }className 类名
  */
 const Typewriter: FC<{ text: string; typingSpeed: number; className: string }> = ({ text, typingSpeed, className }) => {
   const [displayText, setDisplayText] = useState('');

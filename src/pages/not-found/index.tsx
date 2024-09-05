@@ -1,5 +1,8 @@
 import './index.less';
 
+/**
+ * @description 404 页面
+ */
 const NotFound = () => {
   return (
     <div className="not-found">
