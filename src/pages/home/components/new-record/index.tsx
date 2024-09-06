@@ -1,6 +1,6 @@
 import { Close, CalendarMonth } from '@mui/icons-material';
 import { FC, useCallback, useState } from 'react';
-import { formatNumberToString, fetchData } from '@myUtils/index';
+import { formatNumberToString } from '@myUtils/index';
 import dayjs, { Dayjs } from 'dayjs';
 import { KINDLIST } from './constants';
 import { Keyboard, CostNumber } from '../index';
@@ -9,7 +9,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PopUp } from '@myComponents/pop-up';
 import { ReactSetState } from '@myTypes/index';
-import { NewKind } from '@myComponents/new-kind';
+import { NewKind, MovePanel } from '@myComponents/index';
 import { usePopstateNotLeave } from '@myHooks/usePopstate';
 import './index.less';
 
@@ -68,20 +68,24 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
   /**
    * @description 发送添加种类测试
    */
-  const sendKindTest = () => {
-    const res = fetchData<{ test: string }, { name: string }>(
-      'POST',
-      {
-        url: '//localhost:3000/v1/kinds-parents/create-kinds-parent',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      },
-      {
-        name: 'test'
-      }
-    );
-    console.log(res);
+  // const sendKindTest = () => {
+  //   const res = fetchData<{ test: string }, { name: string }>(
+  //     'POST',
+  //     {
+  //       url: '//localhost:3000/v1/kinds-parents/create-kinds-parent',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       }
+  //     },
+  //     {
+  //       name: 'test'
+  //     }
+  //   );
+  //   console.log(res);
+  // };
+
+  const movePanel = (index: number) => {
+    setKind(KINDLIST[index]);
   };
 
   return (
@@ -115,14 +119,30 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
         />
       </div>
       <div className="record-content">
-        <button onClick={sendKindTest}></button>
-        <button
-          onClick={() => {
-            setAddKindShow(true);
-          }}
-        >
-          new kind
-        </button>
+        <MovePanel gap={20} actionDistance={40} moveCallback={movePanel} currentIndex={kind.id}>
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'red',
+              borderRadius: '10px',
+              overflow: 'hidden'
+            }}
+          >
+            123
+          </div>
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'blue',
+              borderRadius: '10px',
+              overflow: 'hidden'
+            }}
+          >
+            123
+          </div>
+        </MovePanel>
       </div>
       <div className="record-cost-info">{`${time.format('YYYY-MM-DD')} / ${kind.title}`}</div>
       <div className="record-action">
