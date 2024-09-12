@@ -5,7 +5,9 @@ import {
   SystemIconResType,
   UserIconsResType,
   CreateKindsParentParamsType,
-  CreateKindsParentResType
+  CreateKindsParentResType,
+  CreateKindChildParamsType,
+  CreateKindChildResType
 } from './types';
 
 /**
@@ -15,6 +17,11 @@ class NewKindService {
   // 添加父级种类请求配置
   private readonly kindsParentsUrl = `${SERVER_URL}/kinds-parents`;
   private readonly kindsParentsHeaders = {
+    'Content-Type': 'application/json'
+  };
+  // 添加子级种类请求配置
+  private readonly kindsChildrensUrl = `${SERVER_URL}/kinds-children`;
+  private readonly kindsChildrenHeaders = {
     'Content-Type': 'application/json'
   };
 
@@ -108,12 +115,13 @@ class NewKindService {
    * @param { string } svgCode svg 代码
    * @returns 创建结果
    */
-  createKindsParent = async (name: string, fileName: string, svgCodeId: string) => {
+  createKindsParent = async (name: string, fileName: string, svgCodeId: string, type: number) => {
     try {
       const params = {
         name,
-        file_name: fileName,
-        svg_code_id: svgCodeId
+        file_name: fileName === '' ? null : fileName,
+        svg_code_id: svgCodeId === '' ? null : svgCodeId,
+        type: type
       };
       const res = await fetchData<CreateKindsParentResType, CreateKindsParentParamsType>(
         'POST',
@@ -126,6 +134,32 @@ class NewKindService {
       return formatResonse<CreateKindsParentResType>(res);
     } catch {
       return formatResonse<CreateKindsParentResType>({
+        code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR,
+        message: 'error',
+        data: { error_type: 0 }
+      });
+    }
+  };
+
+  createKindsChild = async (name: string, fileName: string, svgCodeId: string, parentId: string) => {
+    try {
+      const params = {
+        name,
+        file_name: fileName === '' ? null : fileName,
+        svg_code_id: svgCodeId === '' ? null : svgCodeId,
+        parent_id: parentId
+      };
+      const res = await fetchData<CreateKindChildResType, CreateKindChildParamsType>(
+        'POST',
+        {
+          url: this.kindsChildrensUrl + '/create-kinds-child',
+          headers: this.kindsChildrenHeaders
+        },
+        params
+      );
+      return formatResonse<CreateKindChildResType>(res);
+    } catch {
+      return formatResonse<CreateKindChildResType>({
         code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR,
         message: 'error',
         data: { error_type: 0 }

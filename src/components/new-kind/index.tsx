@@ -6,7 +6,8 @@ import { SystemIconType, UserIconType } from './types';
 import {
   UploadIconErrorTypeEnums,
   CreateKindsParentErrorTypeEnums,
-  GetAllIconsByUserErrorTypeEnums
+  GetAllIconsByUserErrorTypeEnums,
+  CreateKindChildErrorTypeEnums
 } from './constants';
 import { usePopstateLeave } from '@myHooks/usePopstate';
 import './index.less';
@@ -16,8 +17,10 @@ import './index.less';
  * @param type 种类类型
  * @param { () => void } close 关闭事件
  * @param { boolean } show 是否显示
+ * @param { string } parentId 父类id
  */
 export const NewKind: FC<{
+  parentId: string;
   type: {
     id: number;
     type: NEW_KIND_TYPE_ENUM;
@@ -26,7 +29,7 @@ export const NewKind: FC<{
   };
   close: () => void;
   show: boolean;
-}> = ({ type, close, show }) => {
+}> = ({ type, close, show, parentId }) => {
   // 自定义图标路径
   const [imgSrc, setImgSrc] = useState<string>('');
   // 系统图标 SVG 对象
@@ -173,6 +176,49 @@ export const NewKind: FC<{
     });
   };
 
+  const createParentsKind = async () => {
+    // imgSrc 去掉 /static/ 字符
+    const fileName = imgSrc.split('/static/')[1];
+    const res = await newKindService.createKindsParent(
+      kindName,
+      fileName,
+      systemSvgCode.id,
+      type.type === NEW_KIND_TYPE_ENUM.EXPENSES ? 0 : 1
+    );
+    if (!res.success) {
+      switch (res.data.error_type) {
+        case CreateKindsParentErrorTypeEnums.FAILED_TO_CREATE:
+          console.error('获取失败');
+          break;
+        default:
+          console.error('请检查网络');
+          break;
+      }
+    } else {
+      console.log('创建成功');
+      backEvent();
+    }
+  };
+
+  const createChildKind = async () => {
+    // imgSrc 去掉 /static/ 字符
+    const fileName = imgSrc.split('/static/')[1];
+    const res = await newKindService.createKindsChild(kindName, fileName, systemSvgCode.id, parentId);
+    if (!res.success) {
+      switch (res.data.error_type) {
+        case CreateKindChildErrorTypeEnums.FAILED_TO_CREATE:
+          console.error('获取失败');
+          break;
+        default:
+          console.error('请检查网络');
+          break;
+      }
+    } else {
+      console.log('创建成功');
+      backEvent();
+    }
+  };
+
   const createKind = async () => {
     if (kindName === '') {
       console.log('请输入名称');
@@ -183,29 +229,9 @@ export const NewKind: FC<{
       return;
     }
     if (type.parents) {
-      // imgSrc 去掉 /static/ 字符
-      const fileName = imgSrc.split('/static/')[1];
-      const res = await newKindService.createKindsParent(
-        kindName,
-        fileName === undefined ? '' : fileName,
-        systemSvgCode.id
-      );
-      if (!res.success) {
-        switch (res.data.error_type) {
-          case CreateKindsParentErrorTypeEnums.FAILED_TO_CREATE:
-            console.error('获取失败');
-            break;
-          default:
-            console.error('请检查网络');
-            break;
-        }
-      } else {
-        console.log('创建成功');
-        backEvent();
-      }
+      createParentsKind();
     } else {
-      // const res = await newKindService.createChildKind(kindName, imgSrc, svgCode);
-      // if (!res.success) {}
+      createChildKind();
     }
   };
 

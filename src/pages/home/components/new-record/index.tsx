@@ -1,5 +1,5 @@
 import { Close, CalendarMonth } from '@mui/icons-material';
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { formatNumberToString } from '@myUtils/index';
 import dayjs, { Dayjs } from 'dayjs';
 import { KINDLIST } from './constants';
@@ -11,6 +11,7 @@ import { PopUp } from '@myComponents/pop-up';
 import { ReactSetState } from '@myTypes/index';
 import { NewKind, MovePanel } from '@myComponents/index';
 import { usePopstateNotLeave } from '@myHooks/usePopstate';
+import newRecordService from './index.service';
 import './index.less';
 
 /**
@@ -29,11 +30,14 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
   const [showCalendar, setShowCalendar] = useState(false);
   // 是否显示添加种类页面
   const [addKindShow, setAddKindShow] = useState(false);
+  // 父类id
+  const [parentId, setParentId] = useState('e3e392d8-03d0-4d32-abb0-16a93f738d5f');
 
   /**
    * @description 返回事件
    */
   const backEvent = useCallback(() => {
+    setParentId('');
     close();
   }, []);
 
@@ -88,6 +92,23 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
     setKind(KINDLIST[index]);
   };
 
+  const showNewKind = (parent: boolean) => {
+    if (parent) {
+      const newKind = {
+        ...kind,
+        parents: true
+      };
+      setKind(newKind);
+    } else {
+      const newKind = {
+        ...kind,
+        parents: false
+      };
+      setKind(newKind);
+    }
+    setAddKindShow(true);
+  };
+
   return (
     <div
       className="home-new-record"
@@ -97,7 +118,7 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
         opacity: show ? '1' : '0'
       }}
     >
-      <NewKind type={kind} close={closeAddKind} show={addKindShow} />
+      <NewKind type={kind} close={closeAddKind} show={addKindShow} parentId={parentId} />
       <Close className="close" onClick={close} />
       <div
         style={{
@@ -120,28 +141,8 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
       </div>
       <div className="record-content">
         <MovePanel gap={20} actionDistance={40} moveCallback={movePanel} currentIndex={kind.id}>
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'red',
-              borderRadius: '10px',
-              overflow: 'hidden'
-            }}
-          >
-            123
-          </div>
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'blue',
-              borderRadius: '10px',
-              overflow: 'hidden'
-            }}
-          >
-            123
-          </div>
+          <KindPanel showNewKind={showNewKind} />
+          <KindPanel showNewKind={showNewKind} />
         </MovePanel>
       </div>
       <div className="record-cost-info">{`${time.format('YYYY-MM-DD')} / ${kind.title}`}</div>
@@ -199,6 +200,23 @@ const Calendar: FC<{ time: Dayjs; setTime: ReactSetState<Dayjs>; closeEvent: () 
           }}
         />
       </LocalizationProvider>
+    </div>
+  );
+};
+
+const KindPanel: FC<{ showNewKind: (parent: boolean) => void }> = ({ showNewKind }) => {
+  const getKindParents = async () => {
+    const res = await newRecordService.getKindParents();
+    console.log(res);
+  };
+
+  useEffect(() => {
+    getKindParents();
+  }, []);
+  return (
+    <div className="record-content-card">
+      <button onClick={() => showNewKind(true)}>show P</button>
+      <button onClick={() => showNewKind(false)}>show S</button>
     </div>
   );
 };

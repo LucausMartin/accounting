@@ -48,13 +48,28 @@ export interface UserIconsResType {
  */
 export interface CreateKindsParentParamsType {
   name: string;
-  file_name: string;
-  svg_code_id: string;
+  file_name: string | null;
+  svg_code_id: string | null;
+  type: number;
 }
 
 /**
  * @description 创建种类父级请求响应参数类型
  */
 export interface CreateKindsParentResType {
+  success: boolean;
+}
+
+export interface CreateKindChildParamsType {
+  name: string;
+  file_name: string | null;
+  svg_code_id: string | null;
+  parent_id: string;
+}
+
+/**
+ * @description 创建子种类请求响应参数类型
+ */
+export interface CreateKindChildResType {
   success: boolean;
 }
