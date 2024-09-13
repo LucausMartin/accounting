@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from 'react-router-dom';
-import { logout, selectLogin } from '@myStore/slices/login';
-import { useAppDispatch, useAppSelector } from '@myStore/hooks';
+import { selectLogin } from '@myStore/slices/login';
+import { useAppSelector } from '@myStore/hooks';
 import { Login } from '@myPages/login';
 import { LOGIN_STATE_ENUM } from '@myConstants/index';
 import { Home, BarChart, AccountCircle } from '@mui/icons-material';
@@ -10,7 +10,6 @@ import { fetchData } from '@myUtils/fetchData';
 
 function App() {
   const loginState = useAppSelector(selectLogin);
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const test = async () => {
@@ -32,7 +31,6 @@ function App() {
   useEffect(() => {
     navigate('/home');
     test();
-    window.opener = window;
   }, []);
 
   return (
@@ -46,7 +44,7 @@ function App() {
       <Login
         show={loginState === LOGIN_STATE_ENUM.READY}
         closeEvent={() => {
-          dispatch(logout());
+          window.location.reload();
         }}
       ></Login>
     </div>

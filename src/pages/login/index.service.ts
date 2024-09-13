@@ -66,9 +66,7 @@ class LoginService {
         params
       );
       return formatResonse<RegisterResType>(res);
-    } catch (error) {
-      // TODO: '处理错误';
-      console.log(error);
+    } catch {
       return formatResonse<RegisterResType>({
         code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR,
         message: 'error',
@@ -98,9 +96,7 @@ class LoginService {
         params
       );
       return formatResonse(res);
-    } catch (error) {
-      // TODO: '处理错误';
-      console.log(error);
+    } catch {
       return formatResonse<LoginResType>({
         code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR,
         message: 'error',

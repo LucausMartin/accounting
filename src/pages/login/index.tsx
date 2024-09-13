@@ -13,6 +13,8 @@ import {
 } from './constants';
 import './index.less';
 import localforage from 'localforage';
+import { login } from '@myStore/slices/login';
+import { useAppDispatch } from '@myStore/hooks';
 
 /**
  * @description 登录组件
@@ -20,6 +22,7 @@ import localforage from 'localforage';
  * @param { boolean } show 是否显示
  */
 export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEvent, show }) => {
+  const dispatch = useAppDispatch();
   // 发送验证码按钮文本
   const [sendButText, setSendButText] = useState<'Send' | number>('Send');
   // 发送验证码按钮是否禁用
@@ -118,7 +121,7 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
       return;
     }
     if (state === StateEnum.LOGIN) {
-      login();
+      loginEvent();
       return;
     } else {
       register();
@@ -149,16 +152,19 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
           break;
       }
     } else {
-      await localforage.setItem('access_token', res.data.access_token);
-      await localforage.setItem('refresh_token', res.data.refresh_token);
-      closeEvent();
+      localforage.setItem('access_token', res.data.access_token).then(() => {
+        localforage.setItem('refresh_token', res.data.refresh_token).then(() => {
+          dispatch(login());
+          closeEvent();
+        });
+      });
     }
   };
 
   /**
    * @description 登录事件
    */
-  const login = async () => {
+  const loginEvent = async () => {
     const res = await loginService.login(email, code);
     if (!res.success) {
       switch (res.data.error_type) {
@@ -176,9 +182,12 @@ export const Login: FC<{ closeEvent: () => void; show: boolean }> = ({ closeEven
           break;
       }
     } else {
-      await localforage.setItem('access_token', res.data.accessToken);
-      await localforage.setItem('refresh_token', res.data.refreshToken);
-      closeEvent();
+      localforage.setItem('access_token', res.data.access_token).then(() => {
+        localforage.setItem('refresh_token', res.data.refresh_token).then(() => {
+          dispatch(login());
+          closeEvent();
+        });
+      });
     }
   };
 

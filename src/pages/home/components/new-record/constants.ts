@@ -17,3 +17,11 @@ export const KINDLIST = [
     parents: true
   }
 ];
+
+/**
+ * @description 获取种类父级请求错误类型枚举
+ */
+export const enum GetKindsParentsByEmailErrorTypeEnums {
+  FAILED_TO_GET = 1,
+  NETWORK = 0
+}

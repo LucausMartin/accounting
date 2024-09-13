@@ -11,16 +11,45 @@ class NewRecordService {
     'Content-Type': 'application/json'
   };
 
-  async getKindParents() {
+  /**
+   * @description 获取支出种类父级
+   * @returns 请求结果
+   */
+  async getExpensesKindParents() {
     try {
       const res = await fetchData<GetKindParentsResType>('GET', {
-        url: this.url + '/get-kinds-parents-by-email',
+        url: this.url + '/get-expenses-kinds-parents-by-email',
         headers: this.headers
       });
-      return formatResonse(res);
+      return formatResonse<GetKindParentsResType>(res);
     } catch (error) {
       console.log(error);
-      return formatResonse({ code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR, message: 'error', data: { error_type: 0 } });
+      return formatResonse<GetKindParentsResType>({
+        code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR,
+        message: 'error',
+        data: { error_type: 0 }
+      });
+    }
+  }
+
+  /**
+   * @description 获取收入种类父级
+   * @returns 请求结果
+   */
+  async getIncomeKindParents() {
+    try {
+      const res = await fetchData<GetKindParentsResType>('GET', {
+        url: this.url + '/get-income-kinds-parents-by-email',
+        headers: this.headers
+      });
+      return formatResonse<GetKindParentsResType>(res);
+    } catch (error) {
+      console.log(error);
+      return formatResonse<GetKindParentsResType>({
+        code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR,
+        message: 'error',
+        data: { error_type: 0 }
+      });
     }
   }
 }

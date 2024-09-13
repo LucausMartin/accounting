@@ -2,7 +2,7 @@ import { Close, CalendarMonth } from '@mui/icons-material';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { formatNumberToString } from '@myUtils/index';
 import dayjs, { Dayjs } from 'dayjs';
-import { KINDLIST } from './constants';
+import { KINDLIST, GetKindsParentsByEmailErrorTypeEnums } from './constants';
 import { Keyboard, CostNumber } from '../index';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -12,6 +12,7 @@ import { ReactSetState } from '@myTypes/index';
 import { NewKind, MovePanel } from '@myComponents/index';
 import { usePopstateNotLeave } from '@myHooks/usePopstate';
 import newRecordService from './index.service';
+import { NEW_KIND_TYPE_ENUM } from '@myConstants/index';
 import './index.less';
 
 /**
@@ -141,8 +142,8 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
       </div>
       <div className="record-content">
         <MovePanel gap={20} actionDistance={40} moveCallback={movePanel} currentIndex={kind.id}>
-          <KindPanel showNewKind={showNewKind} />
-          <KindPanel showNewKind={showNewKind} />
+          <KindPanel showNewKind={showNewKind} type={NEW_KIND_TYPE_ENUM.EXPENSES} />
+          <KindPanel showNewKind={showNewKind} type={NEW_KIND_TYPE_ENUM.INCOME} />
         </MovePanel>
       </div>
       <div className="record-cost-info">{`${time.format('YYYY-MM-DD')} / ${kind.title}`}</div>
@@ -204,15 +205,61 @@ const Calendar: FC<{ time: Dayjs; setTime: ReactSetState<Dayjs>; closeEvent: () 
   );
 };
 
-const KindPanel: FC<{ showNewKind: (parent: boolean) => void }> = ({ showNewKind }) => {
-  const getKindParents = async () => {
-    const res = await newRecordService.getKindParents();
-    console.log(res);
+/**
+ * @description 种类面板
+ * @param { (parent: boolean) => void } showNewKind 显示添加种类
+ * @param { NEW_KIND_TYPE_ENUM } type 种类类型
+ */
+const KindPanel: FC<{
+  showNewKind: (parent: boolean) => void;
+  type: NEW_KIND_TYPE_ENUM;
+}> = ({ showNewKind, type }) => {
+  /**
+   * @description 获取支出种类父级
+   */
+  const getExpensesKindParents = async () => {
+    const res = await newRecordService.getExpensesKindParents();
+    if (!res.success) {
+      // TODO: 错误处理
+      switch (res.data.error_type) {
+        case GetKindsParentsByEmailErrorTypeEnums.FAILED_TO_GET:
+          console.error('获取失败');
+          break;
+        default:
+          console.error('请检查网络');
+      }
+    } else {
+      console.log(res.data.kind_parents);
+    }
+  };
+
+  /**
+   * @description 获取收入种类父级
+   */
+  const getIncomeKindParents = async () => {
+    const res = await newRecordService.getIncomeKindParents();
+    if (!res.success) {
+      // TODO: 错误处理
+      switch (res.data.error_type) {
+        case GetKindsParentsByEmailErrorTypeEnums.FAILED_TO_GET:
+          console.error('获取失败');
+          break;
+        default:
+          console.error('请检查网络');
+      }
+    } else {
+      console.log(res.data.kind_parents);
+    }
   };
 
   useEffect(() => {
-    getKindParents();
+    if (type === NEW_KIND_TYPE_ENUM.EXPENSES) {
+      getExpensesKindParents();
+    } else if (type === NEW_KIND_TYPE_ENUM.INCOME) {
+      getIncomeKindParents();
+    }
   }, []);
+
   return (
     <div className="record-content-card">
       <button onClick={() => showNewKind(true)}>show P</button>

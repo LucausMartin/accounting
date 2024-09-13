@@ -10,8 +10,8 @@ export interface RegisterResType {
  * @description 登录请求响应类型
  */
 export interface LoginResType {
-  accessToken: string;
-  refreshToken: string;
+  access_token: string;
+  refresh_token: string;
 }
 
 /**

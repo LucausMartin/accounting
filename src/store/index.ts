@@ -1,8 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import loginSlice from './slices/login';
+import accountSlice from './slices/account';
+
 const store = configureStore({
   reducer: {
-    loginer: loginSlice
+    loginer: loginSlice,
+    accounter: accountSlice
   }
 });
 
