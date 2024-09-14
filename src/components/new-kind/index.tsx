@@ -10,6 +10,7 @@ import {
   CreateKindChildErrorTypeEnums
 } from './constants';
 import { usePopstateLeave } from '@myHooks/usePopstate';
+import { Loading } from '@myComponents/loading';
 import './index.less';
 
 /**
@@ -40,12 +41,12 @@ export const NewKind: FC<{
   });
   // 类别名称
   const [kindName, setKindName] = useState('');
-
   // 系统图标数组
   const [systemIcons, setSystemIcons] = useState<SystemIconType[]>([]);
-
   // 用户上传过的图标
   const [userIcons, setUserIcons] = useState<UserIconType[]>([]);
+  // check loading
+  const [checkLoading, setCheckLoading] = useState(false);
 
   // 返回事件
   const backEvent = useCallback(() => {
@@ -118,7 +119,6 @@ export const NewKind: FC<{
    */
   const getSystemIcons = async () => {
     const res = await newKindService.getAllSystemIcons();
-    console.log(res);
     if (!res.success) {
       // TODO: 错误处理
       switch (res.data.error_type) {
@@ -177,6 +177,7 @@ export const NewKind: FC<{
   };
 
   const createParentsKind = async () => {
+    setCheckLoading(true);
     // imgSrc 去掉 /static/ 字符
     const fileName = imgSrc.split('/static/')[1];
     const res = await newKindService.createKindsParent(
@@ -198,9 +199,11 @@ export const NewKind: FC<{
       console.log('创建成功');
       backEvent();
     }
+    setCheckLoading(false);
   };
 
   const createChildKind = async () => {
+    setCheckLoading(true);
     // imgSrc 去掉 /static/ 字符
     const fileName = imgSrc.split('/static/')[1];
     const res = await newKindService.createKindsChild(kindName, fileName, systemSvgCode.id, parentId);
@@ -217,6 +220,7 @@ export const NewKind: FC<{
       console.log('创建成功');
       backEvent();
     }
+    setCheckLoading(false);
   };
 
   const createKind = async () => {
@@ -232,6 +236,14 @@ export const NewKind: FC<{
       createParentsKind();
     } else {
       createChildKind();
+    }
+  };
+
+  const reanderCheck = () => {
+    if (checkLoading) {
+      return <Loading className="check" sizeScal={0.8} />;
+    } else {
+      return <Check className="check" onClick={createKind} />;
     }
   };
 
@@ -251,7 +263,7 @@ export const NewKind: FC<{
       }}
     >
       <Close className="close" onClick={backEvent} />
-      <Check className="check" onClick={createKind} />
+      {reanderCheck()}
 
       <div className="new-kind-title">{'添加' + type.title + '类别'}</div>
       <div className="new-kind-info">
@@ -307,7 +319,9 @@ export const NewKind: FC<{
                 {systemIcons.slice(index * 6, (index + 1) * 6).map(icon => (
                   <div key={icon.id} onClick={() => selectSystemIcon(icon)}>
                     <div className="new-kind-system-icon" dangerouslySetInnerHTML={{ __html: icon.SVGCode }} />
-                    <div className="new-kind-system-icon-name">{icon.name.split('-')[1]}</div>
+                    <div className="new-kind-system-icon-name">
+                      <span className="new-kind-system-icon-name-text">{icon.name.split('-')[1]}</span>
+                    </div>
                   </div>
                 ))}
               </div>

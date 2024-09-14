@@ -12,7 +12,9 @@ import { ReactSetState } from '@myTypes/index';
 import { NewKind, MovePanel } from '@myComponents/index';
 import { usePopstateNotLeave } from '@myHooks/usePopstate';
 import newRecordService from './index.service';
-import { NEW_KIND_TYPE_ENUM } from '@myConstants/index';
+import { NEW_KIND_TYPE_ENUM, SERVER_IMG_URL } from '@myConstants/index';
+import { KindParentType } from './types';
+import AddIcon from '@myAssets/add.svg';
 import './index.less';
 
 /**
@@ -71,28 +73,17 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
   };
 
   /**
-   * @description 发送添加种类测试
+   * @description 移动面板
+   * @param { number } index 移动到的索引
    */
-  // const sendKindTest = () => {
-  //   const res = fetchData<{ test: string }, { name: string }>(
-  //     'POST',
-  //     {
-  //       url: '//localhost:3000/v1/kinds-parents/create-kinds-parent',
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       }
-  //     },
-  //     {
-  //       name: 'test'
-  //     }
-  //   );
-  //   console.log(res);
-  // };
-
   const movePanel = (index: number) => {
     setKind(KINDLIST[index]);
   };
 
+  /**
+   * @description 显示添加种类
+   * @param { boolean } parent 是否是父类
+   */
   const showNewKind = (parent: boolean) => {
     if (parent) {
       const newKind = {
@@ -214,6 +205,14 @@ const KindPanel: FC<{
   showNewKind: (parent: boolean) => void;
   type: NEW_KIND_TYPE_ENUM;
 }> = ({ showNewKind, type }) => {
+  const addItem: KindParentType = {
+    id: 'default',
+    name: '添加',
+    fileName: AddIcon,
+    svgCodeId: null,
+    children: []
+  };
+  const [kindList, setKindList] = useState<KindParentType[]>([]);
   /**
    * @description 获取支出种类父级
    */
@@ -229,7 +228,7 @@ const KindPanel: FC<{
           console.error('请检查网络');
       }
     } else {
-      console.log(res.data.kind_parents);
+      setKindList([...res.data.kinds_parents, addItem]);
     }
   };
 
@@ -248,8 +247,12 @@ const KindPanel: FC<{
           console.error('请检查网络');
       }
     } else {
-      console.log(res.data.kind_parents);
+      setKindList([...res.data.kinds_parents, addItem]);
     }
+  };
+
+  const clickAddEvent = () => {
+    showNewKind(true);
   };
 
   useEffect(() => {
@@ -262,8 +265,39 @@ const KindPanel: FC<{
 
   return (
     <div className="record-content-card">
-      <button onClick={() => showNewKind(true)}>show P</button>
-      <button onClick={() => showNewKind(false)}>show S</button>
+      {
+        // 六个一行
+        Array.from({ length: Math.ceil(kindList.length / 6) }).map((_, index) => (
+          <div key={index} className="record-content-card-row">
+            {kindList.slice(index * 6, (index + 1) * 6).map(kind => (
+              <div
+                key={kind.id}
+                className="record-content-card-item"
+                onClick={kind.id === 'default' ? clickAddEvent : () => {}}
+              >
+                <div>
+                  {kind.fileName && (
+                    <img
+                      className="record-content-card-item-pic"
+                      src={kind.fileName.includes('/static/') ? SERVER_IMG_URL + kind.fileName : kind.fileName}
+                      alt=""
+                    />
+                  )}
+                  {kind.svgCodeId && (
+                    <div
+                      className="record-content-card-item-pic"
+                      dangerouslySetInnerHTML={{ __html: kind.svgCodeId.SVGCode }}
+                    />
+                  )}
+                </div>
+                <div className="record-content-card-item-name">
+                  <span className="record-content-card-item-name-text">{kind.name}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))
+      }
     </div>
   );
 };

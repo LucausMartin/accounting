@@ -9,18 +9,26 @@
   gap: 10px;
 
   .home-top-bar {
+    position: relative;
     width: 100%;
     height: 40px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
 
     .home-account {
-      position: relative;
+      width: 50%;
+      position: absolute;
+      left: 0;
       display: flex;
       flex-direction: row;
       align-items: center;
       gap: 8px;
+      transition: opacity 0.3s ease-in-out;
+
+      .home-account-name {
+        font-weight: bold;
+        flex: 1;
+      }
 
       .home-account-mask {
         width: 100vw;
@@ -65,10 +73,37 @@
       }
     }
 
+    .home-search {
+      display: flex;
+      align-items: center;
+      position: absolute;
+      transition: left 0.3s ease-in-out;
+    }
+
     .icon {
       color: var(--main-color);
       height: 30px;
       width: 30px;
+    }
+  }
+
+  .home-search-input {
+    width: 100%;
+    position: absolute;
+    top: 15px;
+    height: 30px;
+    transition: right 0.3s ease-in-out, left 0.3s ease-in-out;
+
+    .home-search-input-entity{
+      position: absolute;
+      right: 10px;
+      padding: 0 10px;
+      caret-color: var(--main-color);
+      outline: none;
+      border: none;
+      border-radius: 20px;
+      width: calc(100% - 54px);
+      height: 100%;
     }
   }
 

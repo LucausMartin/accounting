@@ -1,14 +1,22 @@
 export interface KindParentType {
-  id: number;
+  id: string;
   name: string;
-  kind_children: KindChildType[];
+  fileName: string | null;
+  svgCodeId: ScgCodeIdType | null;
+  children: KindChildType[];
+}
+
+interface ScgCodeIdType {
+  id: string;
+  name: string;
+  SVGCode: string;
 }
 
 export interface KindChildType {
-  id: number;
+  id: string;
   name: string;
 }
 
 export interface GetKindParentsResType {
-  kind_parents: KindParentType[];
+  kinds_parents: KindParentType[];
 }
