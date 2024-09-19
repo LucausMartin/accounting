@@ -25,3 +25,8 @@ export const enum GetKindsParentsByEmailErrorTypeEnums {
   FAILED_TO_GET = 1,
   NETWORK = 0
 }
+
+export enum AddAccountItemErrorTypeEnums {
+  FAILED_TO_ADD = 1,
+  NETWORK = 0
+}

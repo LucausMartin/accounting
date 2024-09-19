@@ -8,7 +8,11 @@ import './index.less';
  * @param { ReactSetState<string> } setCostNumber 设置消费金额事件
  * @param { () => void } reset 重置事件
  */
-const Keyboard: FC<{ setCostNumber: ReactSetState<string>; reset: () => void }> = ({ setCostNumber, reset }) => {
+const Keyboard: FC<{
+  setCostNumber: ReactSetState<string>;
+  reset: () => void;
+  addRecord: (again: boolean) => void;
+}> = ({ setCostNumber, reset, addRecord }) => {
   /**
    * @description 震动
    */
@@ -29,7 +33,7 @@ const Keyboard: FC<{ setCostNumber: ReactSetState<string>; reset: () => void }> 
    */
   const clear = () => {
     vibrate();
-    setCostNumber('');
+    reset();
   };
 
   /**
@@ -154,7 +158,9 @@ const Keyboard: FC<{ setCostNumber: ReactSetState<string>; reset: () => void }> 
             style={{
               backgroundColor: 'rgba(148, 148, 148, 0.555)'
             }}
-            onClick={reset}
+            onClick={() => {
+              addRecord(true);
+            }}
           >
             再一笔
           </div>
@@ -183,7 +189,14 @@ const Keyboard: FC<{ setCostNumber: ReactSetState<string>; reset: () => void }> 
         <div className="keyboard-action-button" onClick={clear}>
           清空
         </div>
-        <div className="keyboard-action-button">确认</div>
+        <div
+          className="keyboard-action-button"
+          onClick={() => {
+            addRecord(false);
+          }}
+        >
+          确认
+        </div>
       </div>
     </div>
   );
