@@ -95,7 +95,7 @@ async function fetchData<Data, Params>(
           // 如果没有 refresh token，说明用户未登录
           if (!refresh_token) {
             store.dispatch(ready());
-            throw new Error('请先登录');
+            throw new Error('no refresh token');
           }
           // 有 refresh token，尝试刷新 token
           try {
@@ -109,23 +109,21 @@ async function fetchData<Data, Params>(
             const newAccessTokenJson = await newAccessToken.json();
             if (newAccessTokenJson.code === HTTP_STATUS_ENUM.OK) {
               // 刷新 token 成功，更新 token
-              localforage.setItem('access_token', newAccessTokenJson.data.access_token).then(() => {
-                localforage.setItem('refresh_token', newAccessTokenJson.data.refresh_token).then(() => {
-                  return fetchData(method, options);
-                });
-              });
+              await localforage.setItem('access_token', newAccessTokenJson.data.access_token);
+              await localforage.setItem('refresh_token', newAccessTokenJson.data.refresh_token);
+              return fetchData<Data>('GET', options);
             } else {
               // 刷新 token 失败，删除 token，返回登录页
-              localforage.removeItem('refresh_token').then(() => {
-                store.dispatch(ready());
-              });
+              await localforage.removeItem('refresh_token');
+              store.dispatch(ready());
               throw new Error('身份验证已经过期，请重新登录');
             }
           } catch {
             throw new Error('refresh token error');
           }
+        } else {
+          throw new Error(responseJson.message);
         }
-        throw new Error(responseJson.message);
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -177,23 +175,21 @@ async function fetchData<Data, Params>(
             const newAccessTokenJson = await newAccessToken.json();
             if (newAccessTokenJson.code === HTTP_STATUS_ENUM.OK) {
               // 刷新 token 成功，更新 token
-              localforage.setItem('access_token', newAccessTokenJson.data.access_token).then(() => {
-                localforage.setItem('refresh_token', newAccessTokenJson.data.refresh_token).then(() => {
-                  return fetchData(method, options, params);
-                });
-              });
+              await localforage.setItem('access_token', newAccessTokenJson.data.access_token);
+              await localforage.setItem('refresh_token', newAccessTokenJson.data.refresh_token);
+              return fetchData('POST', options, params);
             } else {
               // 刷新 token 失败，删除 token，返回登录页
-              localforage.removeItem('refresh_token').then(() => {
-                store.dispatch(ready());
-              });
+              await localforage.removeItem('refresh_token');
+              store.dispatch(ready());
               throw new Error(newAccessTokenJson.message);
             }
           } catch {
             throw new Error('refresh token error');
           }
+        } else {
+          throw new Error(responseJson.message);
         }
-        throw new Error(responseJson.message);
       }
     } catch (err) {
       if (err instanceof Error) {

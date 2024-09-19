@@ -79,7 +79,8 @@ class NewKindService {
         headers: this.systemIconsHeaders
       });
       return formatResonse<SystemIconResType>(res);
-    } catch {
+    } catch (err) {
+      console.warn(err);
       return formatResonse<SystemIconResType>({
         code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR,
         message: 'error',

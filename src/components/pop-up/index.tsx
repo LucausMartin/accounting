@@ -3,9 +3,9 @@ import './index.less';
 
 /**
  * @description 带有过渡动画的全屏遮罩弹窗
- * @param { JSX.Element } children
- * @param { () => void } closeEvent
- * @param { boolean } show
+ * @param { JSX.Element } children 子元素
+ * @param { () => void } closeEvent 关闭事件
+ * @param { boolean } show 是否显示
  */
 export const PopUp: FC<{ children: JSX.Element; closeEvent: () => void; show: boolean }> = ({
   children,

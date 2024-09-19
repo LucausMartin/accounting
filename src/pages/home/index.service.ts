@@ -14,8 +14,7 @@ class HomeService {
         headers: this.headers
       });
       return formatResonse<GetAllAccountsResType>(res);
-    } catch (error) {
-      console.log(error);
+    } catch {
       return formatResonse<GetAllAccountsResType>({
         code: HTTP_STATUS_ENUM.INTERNAL_SERVER_ERROR,
         message: 'error',

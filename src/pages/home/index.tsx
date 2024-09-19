@@ -41,9 +41,12 @@ const Home = () => {
     if (!res.success) {
       switch (res.data.error_type) {
         case GetAccountsErrorTypeEnums.FAILED_TO_GET:
-          console.error('获取失败');
+          dispatch(setAccount(null));
+          setAccountList([]);
           break;
         default:
+          dispatch(setAccount(null));
+          setAccountList([]);
           console.error('请检查网络');
           break;
       }
@@ -74,14 +77,19 @@ const Home = () => {
    * @description 渲染账本名称
    * @returns {JSX.Element} 账本名称或 Loading 或 错误信息
    */
-  const renderAccountName = () => {
+  const renderAccountName = (): JSX.Element => {
     if (accountLoading) {
       return <Loading color="var(--main-color)" sizeScal={0.7} />;
     } else if (accountState) {
       return <div className="home-account-name">{accountState.name}</div>;
     } else if (getAccountError) {
-      return <div className="error">获取账本失败</div>;
+      return (
+        <div className="error" onClick={() => getAccountList()}>
+          获取账本失败
+        </div>
+      );
     }
+    return <></>;
   };
 
   const clickSearchIconEvent = () => {

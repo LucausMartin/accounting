@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import './index.less';
 
-const Loading: FC<{ color?: string; sizeScal?: number; className: string }> = ({
+const Loading: FC<{ color?: string; sizeScal?: number; className?: string }> = ({
   color = 'black',
   sizeScal = 1,
   className
