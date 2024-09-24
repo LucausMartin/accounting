@@ -387,6 +387,7 @@ const KindPanel: FC<{
     showNewKind(true);
   };
 
+  // 添加新种类后重新获取种类
   useEffect(() => {
     if (addKindShow) {
       return;
@@ -398,6 +399,7 @@ const KindPanel: FC<{
     }
   }, [addKindShow]);
 
+  // 初始化获取种类
   useEffect(() => {
     if (type === NEW_KIND_TYPE_ENUM.EXPENSES) {
       getExpensesKindParents();
