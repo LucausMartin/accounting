@@ -9,7 +9,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PopUp } from '@myComponents/pop-up';
 import { ReactSetState } from '@myTypes/index';
-import { NewKind, MovePanel } from '@myComponents/index';
+import { NewKind, MovePanel, LoadingBall, Message, ErrorImg } from '@myComponents/index';
 import { usePopstateNotLeave } from '@myHooks/usePopstate';
 import newRecordService from './index.service';
 import { NEW_KIND_TYPE_ENUM, SERVER_IMG_URL } from '@myConstants/index';
@@ -67,7 +67,6 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
    * @description 关闭日历
    */
   const closeCalendar = () => {
-    console.log('closeCalendar');
     setShowCalendar(false);
   };
 
@@ -144,31 +143,43 @@ const NewRecord: FC<{ close: () => void; show: boolean }> = ({ close, show }) =>
     setChild(kind);
   };
 
+  /**
+   * @description 添加账单请求方法
+   * @param { AccountAddItemParamsType } params 添加账单参数
+   * @returns { Promise<boolean> } 是否添加成功
+   */
   const addRecordFetch = async (params: AccountAddItemParamsType) => {
     const res = await newRecordService.addNewRecord(params);
     if (!res.success) {
       switch (res.data.error_type) {
         case AddAccountItemErrorTypeEnums.FAILED_TO_ADD:
-          console.error('添加失败');
+          Message('网络错误，请稍后再试', 2000, 'error');
           break;
         default:
-          console.error('请检查网络');
+          Message('网络错误，请稍后再试', 2000, 'error');
       }
       return false;
     } else {
+      Message('添加成功', 2000, 'success');
       return true;
     }
   };
 
+  /**
+   * @description 添加账单
+   * @param { boolean } again 是否继续添加
+   */
   const addRecord = async (again: boolean) => {
-    // TODO: 错误提示
     if (!child) {
+      Message('请选择种类', 2000, 'warning');
       return;
     }
     if (!parent) {
+      Message('请选择种类', 2000, 'warning');
       return;
     }
     if (!accountState) {
+      Message('请先选择账户', 2000, 'warning');
       return;
     }
     const params: AccountAddItemParamsType = {
@@ -344,47 +355,61 @@ const KindPanel: FC<{
   };
 
   const [kindList, setKindList] = useState<KindParentType[]>([]);
+  const [fetchError, setFetchError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   /**
    * @description 获取支出种类父级
    */
   const getExpensesKindParents = async () => {
+    setLoading(true);
     const res = await newRecordService.getExpensesKindParents();
     if (!res.success) {
-      // TODO: 错误处理
       switch (res.data.error_type) {
         case GetKindsParentsByEmailErrorTypeEnums.FAILED_TO_GET:
-          console.error('获取失败');
+          setFetchError(true);
           break;
         default:
-          console.error('请检查网络');
+          setFetchError(true);
       }
     } else {
+      setFetchError(false);
       setKindList([...res.data.kinds_parents, addItem]);
     }
+    setLoading(false);
   };
 
   /**
    * @description 获取收入种类父级
    */
   const getIncomeKindParents = async () => {
+    setLoading(true);
     const res = await newRecordService.getIncomeKindParents();
     if (!res.success) {
-      // TODO: 错误处理
       switch (res.data.error_type) {
         case GetKindsParentsByEmailErrorTypeEnums.FAILED_TO_GET:
-          console.error('获取失败');
+          setFetchError(true);
           break;
         default:
-          console.error('请检查网络');
+          setFetchError(true);
       }
     } else {
+      setFetchError(false);
       setKindList([...res.data.kinds_parents, addItem]);
     }
+    setLoading(false);
   };
 
   const clickAddEvent = () => {
     showNewKind(true);
+  };
+
+  const fetchData = () => {
+    if (type === NEW_KIND_TYPE_ENUM.EXPENSES) {
+      getExpensesKindParents();
+    } else if (type === NEW_KIND_TYPE_ENUM.INCOME) {
+      getIncomeKindParents();
+    }
   };
 
   // 添加新种类后重新获取种类
@@ -401,50 +426,55 @@ const KindPanel: FC<{
 
   // 初始化获取种类
   useEffect(() => {
-    if (type === NEW_KIND_TYPE_ENUM.EXPENSES) {
-      getExpensesKindParents();
-    } else if (type === NEW_KIND_TYPE_ENUM.INCOME) {
-      getIncomeKindParents();
-    }
+    fetchData();
   }, []);
 
-  return (
-    <div className="record-content-card">
-      {
-        // 六个一行
-        Array.from({ length: Math.ceil(kindList.length / 6) }).map((_, index) => (
-          <div key={index} className="record-content-card-row">
-            {kindList.slice(index * 6, (index + 1) * 6).map(kind => (
-              <div
-                key={kind.id}
-                className="record-content-card-item"
-                onClick={kind.id === 'default' ? clickAddEvent : () => openChildPanel(kind)}
-              >
-                <div>
-                  {kind.fileName && (
-                    <img
-                      className="record-content-card-item-pic"
-                      src={kind.fileName.includes('/static/') ? SERVER_IMG_URL + kind.fileName : kind.fileName}
-                      alt=""
-                    />
-                  )}
-                  {kind.svgCodeId && (
-                    <div
-                      className="record-content-card-item-pic"
-                      dangerouslySetInnerHTML={{ __html: kind.svgCodeId.SVGCode }}
-                    />
-                  )}
-                </div>
-                <div className="record-content-card-item-name">
-                  <span className="record-content-card-item-name-text">{kind.name}</span>
-                </div>
+  const renderKindList = () => {
+    if (loading) {
+      return (
+        <div className="record-content-card-loading">
+          <LoadingBall color="var(--main-color)" sizeScal={1.7} />
+        </div>
+      );
+    }
+    if (fetchError) {
+      return <ErrorImg message="获取种类失败，请点击重试" fetchData={fetchData} />;
+    }
+    return (
+      // 六个一行
+      Array.from({ length: Math.ceil(kindList.length / 6) }).map((_, index) => (
+        <div key={index} className="record-content-card-row">
+          {kindList.slice(index * 6, (index + 1) * 6).map(kind => (
+            <div
+              key={kind.id}
+              className="record-content-card-item"
+              onClick={kind.id === 'default' ? clickAddEvent : () => openChildPanel(kind)}
+            >
+              <div>
+                {kind.fileName && (
+                  <img
+                    className="record-content-card-item-pic"
+                    src={kind.fileName.includes('/static/') ? SERVER_IMG_URL + kind.fileName : kind.fileName}
+                    alt=""
+                  />
+                )}
+                {kind.svgCodeId && (
+                  <div
+                    className="record-content-card-item-pic"
+                    dangerouslySetInnerHTML={{ __html: kind.svgCodeId.SVGCode }}
+                  />
+                )}
               </div>
-            ))}
-          </div>
-        ))
-      }
-    </div>
-  );
+              <div className="record-content-card-item-name">
+                <span className="record-content-card-item-name-text">{kind.name}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ))
+    );
+  };
+  return <div className="record-content-card">{renderKindList()}</div>;
 };
 
 /**

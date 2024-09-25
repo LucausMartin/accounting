@@ -5,15 +5,51 @@
 }
 
 html {
-  overflow: auto;
   line-height: 1.15;
 
   body {
+    overscroll-behavior-y: contain;
     overflow: hidden;
     margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
+
+    .error-message {
+      position: fixed;
+      top: -50px;
+      left: calc(50% - 150px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 300px;
+      height: 40px;
+      font-size: larger;
+      border-radius: 20px;
+      opacity: 0.95;
+      font-size: 16px;
+      font-weight: bold;
+      transition: top 0.5s ease-in-out;
+    }
+    
+    .error-message-show {
+      position: fixed;
+      top: 10px;
+      left: calc(50% - 150px);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 300px;
+      height: 40px;
+      font-size: larger;
+      border-radius: 20px;
+      font-size: 16px;
+      font-weight: bold;
+      opacity: 0.95;
+      transition: top 0.5s ease-in-out;
+    }
 
     .error {
       color: rgb(175, 29, 29);

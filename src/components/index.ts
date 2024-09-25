@@ -3,4 +3,7 @@ export * from './link';
 export * from './new-kind';
 export * from './type-writer';
 export * from './move-panel';
-export * from './loading';
+export * from './loading-circle';
+export * from './loading-ball';
+export * from './message';
+export * from './error-img';

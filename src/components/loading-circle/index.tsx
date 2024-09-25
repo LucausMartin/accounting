@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import './index.less';
 
-const Loading: FC<{ color?: string; sizeScal?: number; className?: string }> = ({
+const LoadingCircle: FC<{ color?: string; sizeScal?: number; className?: string }> = ({
   color = 'black',
   sizeScal = 1,
   className
@@ -31,4 +31,4 @@ const Loading: FC<{ color?: string; sizeScal?: number; className?: string }> = (
   );
 };
 
-export { Loading };
+export { LoadingCircle };

@@ -8,7 +8,7 @@ import { GetAccountsErrorTypeEnums } from './constants';
 import localforage from 'localforage';
 import { selectAccount, setAccount } from '@myStore/slices/account';
 import { useAppDispatch, useAppSelector } from '@myStore/hooks';
-import { Loading } from '@myComponents/index';
+import { LoadingCircle } from '@myComponents/index';
 import './index.less';
 
 /**
@@ -79,7 +79,7 @@ const Home = () => {
    */
   const renderAccountName = (): JSX.Element => {
     if (accountLoading) {
-      return <Loading color="var(--main-color)" sizeScal={0.7} />;
+      return <LoadingCircle color="var(--main-color)" sizeScal={0.7} />;
     } else if (accountState) {
       return <div className="home-account-name">{accountState.name}</div>;
     } else if (getAccountError) {

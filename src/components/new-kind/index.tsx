@@ -10,7 +10,7 @@ import {
   CreateKindChildErrorTypeEnums
 } from './constants';
 import { usePopstateLeave } from '@myHooks/usePopstate';
-import { Loading } from '@myComponents/loading';
+import { LoadingCircle, LoadingBall, Message, ErrorImg } from '@myComponents/index';
 import './index.less';
 
 /**
@@ -47,6 +47,10 @@ export const NewKind: FC<{
   const [userIcons, setUserIcons] = useState<UserIconType[]>([]);
   // check loading
   const [checkLoading, setCheckLoading] = useState(false);
+  // 获取图标错误
+  const [getIconError, setGetIconError] = useState(false);
+  // 获取图标 Loading
+  const [getIconLoading, setGetIconLoading] = useState(false);
 
   // 返回事件
   const backEvent = useCallback(() => {
@@ -74,7 +78,6 @@ export const NewKind: FC<{
    * @description 选择 SVG 文件上传
    */
   const selectSVG = async () => {
-    console.log('selectSVG');
     const formData = new FormData();
     const input = document.createElement('input');
     input.type = 'file';
@@ -118,20 +121,22 @@ export const NewKind: FC<{
    * @description 获取系统图标
    */
   const getSystemIcons = async () => {
+    setGetIconLoading(true);
     const res = await newKindService.getAllSystemIcons();
     if (!res.success) {
-      // TODO: 错误处理
       switch (res.data.error_type) {
         case CreateKindsParentErrorTypeEnums.FAILED_TO_CREATE:
-          console.error('获取失败');
+          setGetIconError(true);
           break;
         default:
-          console.error('请检查网络');
+          setGetIconError(true);
           break;
       }
     } else {
+      setGetIconError(false);
       setSystemIcons(res.data.svg_code);
     }
+    setGetIconLoading(false);
   };
 
   /**
@@ -147,20 +152,22 @@ export const NewKind: FC<{
    * @description 获取用户上传过的图标
    */
   const getUserIcons = async () => {
+    setGetIconLoading(true);
     const res = await newKindService.getAllIconsbyUser();
     if (!res.success) {
-      // TODO: 错误处理
       switch (res.data.error_type) {
         case GetAllIconsByUserErrorTypeEnums.FAILED_TO_GET:
-          console.error('获取失败');
+          setGetIconError(true);
           break;
         default:
-          console.error('请检查网络');
+          setGetIconError(true);
           break;
       }
     } else {
+      setGetIconError(false);
       setUserIcons(res.data.icons);
     }
+    setGetIconLoading(false);
   };
 
   /**
@@ -189,19 +196,22 @@ export const NewKind: FC<{
     if (!res.success) {
       switch (res.data.error_type) {
         case CreateKindsParentErrorTypeEnums.FAILED_TO_CREATE:
-          console.error('获取失败');
+          Message('创建失败', 2000, 'error');
           break;
         default:
-          console.error('请检查网络');
+          Message('创建失败', 2000, 'error');
           break;
       }
     } else {
-      console.log('创建成功');
+      Message('创建成功', 2000, 'success');
       backEvent();
     }
     setCheckLoading(false);
   };
 
+  /**
+   * @description 创建子类
+   */
   const createChildKind = async () => {
     setCheckLoading(true);
     // imgSrc 去掉 /static/ 字符
@@ -210,26 +220,29 @@ export const NewKind: FC<{
     if (!res.success) {
       switch (res.data.error_type) {
         case CreateKindChildErrorTypeEnums.FAILED_TO_CREATE:
-          console.error('获取失败');
+          Message('创建子类失败', 2000, 'error');
           break;
         default:
-          console.error('请检查网络');
+          Message('创建子类失败', 2000, 'error');
           break;
       }
     } else {
-      console.log('创建成功');
+      Message('创建子类成功', 2000, 'success');
       backEvent();
     }
     setCheckLoading(false);
   };
 
+  /**
+   * @description 创建种类
+   */
   const createKind = async () => {
     if (kindName === '') {
-      console.log('请输入名称');
+      Message('请输入名称', 2000, 'warning');
       return;
     }
     if (imgSrc === '' && systemSvgCode.SVGCode === '') {
-      console.log('请选择图标');
+      Message('请选择图标', 2000, 'warning');
       return;
     }
     if (type.parents) {
@@ -239,19 +252,149 @@ export const NewKind: FC<{
     }
   };
 
+  /**
+   * @description 渲染提交组件
+   * @returns { JSX.Element } 提交组件
+   */
   const reanderCheck = () => {
     if (checkLoading) {
-      return <Loading className="check" sizeScal={0.8} />;
+      return <LoadingCircle className="check" sizeScal={0.8} />;
     } else {
       return <Check className="check" onClick={createKind} />;
     }
   };
 
-  // 获取系统图标
-  useEffect(() => {
+  /**
+   * @description 获取图标
+   */
+  const getIcons = () => {
     getSystemIcons();
     getUserIcons();
+  };
+
+  /**
+   * @description 渲染图标
+   * @returns { JSX.Element } 图标组件
+   */
+  const renderIcons = () => {
+    if (getIconLoading) {
+      return (
+        <div className="new-kind-icons-loading">
+          <LoadingBall color="var(--main-color)" sizeScal={1.7} />
+        </div>
+      );
+    }
+    if (getIconError) {
+      return (
+        <ErrorImg
+          message="图标获取失败请点击重试"
+          style={{
+            height: '60%'
+          }}
+          imgStyle={{
+            height: '50%'
+          }}
+          fetchData={getIcons}
+        />
+      );
+    }
+    if (systemIcons.length > 0 && userIcons.length > 0) {
+      return (
+        <>
+          <div className="new-kind-user-icons">
+            <div className="new-kind-user-icons-title">最近上传图标</div>
+            {
+              // 每六个是一行
+              Array.from({ length: Math.ceil(userIcons.length / 6) }).map((_, index) => (
+                <div className="new-kind-user-icons-row" key={index}>
+                  {userIcons.slice(index * 6, (index + 1) * 6).map(icon => (
+                    <div key={icon.id}>
+                      <div className="new-kind-user-icon" onClick={() => selectUserIcon(icon)}>
+                        <img src={SERVER_IMG_URL + icon.name} alt="" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+          <div className="new-kind-system-icons">
+            <div className="new-kind-system-icons-title">系统图标</div>
+            {
+              // 每六个是一行
+              Array.from({ length: Math.ceil(systemIcons.length / 6) }).map((_, index) => (
+                <div className="new-kind-system-icons-row" key={index}>
+                  {systemIcons.slice(index * 6, (index + 1) * 6).map(icon => (
+                    <div key={icon.id} onClick={() => selectSystemIcon(icon)}>
+                      <div className="new-kind-system-icon" dangerouslySetInnerHTML={{ __html: icon.SVGCode }} />
+                      <div className="new-kind-system-icon-name">
+                        <span className="new-kind-system-icon-name-text">{icon.name.split('-')[1]}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+        </>
+      );
+    }
+    if (systemIcons.length > 0) {
+      return (
+        <div className="new-kind-system-icons">
+          <div className="new-kind-system-icons-title">系统图标</div>
+          {
+            // 每六个是一行
+            Array.from({ length: Math.ceil(systemIcons.length / 6) }).map((_, index) => (
+              <div className="new-kind-system-icons-row" key={index}>
+                {systemIcons.slice(index * 6, (index + 1) * 6).map(icon => (
+                  <div key={icon.id} onClick={() => selectSystemIcon(icon)}>
+                    <div className="new-kind-system-icon" dangerouslySetInnerHTML={{ __html: icon.SVGCode }} />
+                    <div className="new-kind-system-icon-name">
+                      <span className="new-kind-system-icon-name-text">{icon.name.split('-')[1]}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))
+          }
+        </div>
+      );
+    }
+    if (userIcons.length > 0) {
+      return (
+        <div className="new-kind-user-icons">
+          <div className="new-kind-user-icons-title">最近上传图标</div>
+          {
+            // 每六个是一行
+            Array.from({ length: Math.ceil(userIcons.length / 6) }).map((_, index) => (
+              <div className="new-kind-user-icons-row" key={index}>
+                {userIcons.slice(index * 6, (index + 1) * 6).map(icon => (
+                  <div key={icon.id}>
+                    <div className="new-kind-user-icon" onClick={() => selectUserIcon(icon)}>
+                      <img src={SERVER_IMG_URL + icon.name} alt="" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))
+          }
+        </div>
+      );
+    }
+  };
+
+  // 获取系统图标
+  useEffect(() => {
+    getIcons();
   }, []);
+
+  // 获取系统图标
+  useEffect(() => {
+    if (show && getIconError) {
+      getIcons();
+    }
+  }, [show]);
 
   return (
     <div
@@ -264,7 +407,6 @@ export const NewKind: FC<{
     >
       <Close className="close" onClick={backEvent} />
       {reanderCheck()}
-
       <div className="new-kind-title">{'添加' + type.title + '类别'}</div>
       <div className="new-kind-info">
         <div className="new-kind-info-container">
@@ -290,45 +432,7 @@ export const NewKind: FC<{
           )}
         </div>
       </div>
-      <div className="new-kind-icons">
-        {userIcons.length > 0 && (
-          <div className="new-kind-user-icons">
-            <div className="new-kind-user-icons-title">最近上传图标</div>
-            {
-              // 每六个是一行
-              Array.from({ length: Math.ceil(userIcons.length / 6) }).map((_, index) => (
-                <div className="new-kind-user-icons-row" key={index}>
-                  {userIcons.slice(index * 6, (index + 1) * 6).map(icon => (
-                    <div key={icon.id}>
-                      <div className="new-kind-user-icon" onClick={() => selectUserIcon(icon)}>
-                        <img src={SERVER_IMG_URL + icon.name} alt="" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ))
-            }
-          </div>
-        )}
-        <div className="new-kind-system-icons">
-          <div className="new-kind-system-icons-title">系统图标</div>
-          {
-            // 每六个是一行
-            Array.from({ length: Math.ceil(systemIcons.length / 6) }).map((_, index) => (
-              <div className="new-kind-system-icons-row" key={index}>
-                {systemIcons.slice(index * 6, (index + 1) * 6).map(icon => (
-                  <div key={icon.id} onClick={() => selectSystemIcon(icon)}>
-                    <div className="new-kind-system-icon" dangerouslySetInnerHTML={{ __html: icon.SVGCode }} />
-                    <div className="new-kind-system-icon-name">
-                      <span className="new-kind-system-icon-name-text">{icon.name.split('-')[1]}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))
-          }
-        </div>
-      </div>
+      <div className="new-kind-icons">{renderIcons()}</div>
     </div>
   );
 };
